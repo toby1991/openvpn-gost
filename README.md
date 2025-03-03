@@ -37,6 +37,22 @@ docker run -d \
 - `SOCKS_PORT`: SOCKS5代理端口（默认为`1080`）
 - `HTTP_PORT`: HTTP代理端口（默认为`8080`）
 
+### 故障排除
+
+1. TUN设备相关问题
+   - 错误信息：`错误: TUN设备不存在。请确保容器已正确挂载TUN设备。`
+   - 解决方案：
+     1. 确保主机系统支持TUN设备
+     2. 检查TUN设备是否存在：`ls /dev/net/tun`
+     3. 确保在运行容器时使用了`--device=/dev/net/tun:/dev/net/tun`参数
+     4. 在Kubernetes环境中，确保Pod配置了正确的权限和设备挂载
+
+2. OpenVPN连接问题
+   - 如果VPN连接失败，可以查看容器日志获取详细错误信息：
+     ```bash
+     docker logs openvpn-gost
+     ```
+
 例如：
 
 ```bash

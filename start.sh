@@ -10,6 +10,14 @@ fi
 # 如果设置了OVPN_CONFIG环境变量，使用该变量指定的配置文件
 CONFIG_FILE=${OVPN_CONFIG:-"/etc/openvpn/config.ovpn"}
 
+
+# 检查并初始化TUN设备
+if [ ! -c /dev/net/tun ]; then
+    echo "错误: TUN设备不存在。请确保容器已正确挂载TUN设备。"
+    exit 1
+fi
+
+
 # 启动OpenVPN客户端
 echo "正在启动OpenVPN客户端..."
 openvpn --config "$CONFIG_FILE" --daemon
