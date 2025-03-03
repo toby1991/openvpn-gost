@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  openvpn-gost:
+    image: ghcr.io/toby1991/openvpn-gost:main
+    container_name: openvpn-gost
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - "1080:1080"  # SOCKS5代理端口
+      - "8080:8080"  # HTTP代理端口
+    volumes:
+      - ./config.ovpn:/etc/openvpn/config.ovpn:ro
+    environment:
+      - OVPN_CONFIG=/etc/openvpn/config.ovpn
+      - SOCKS_PORT=1080
+      - HTTP_PORT=8080
+    restart: unless-stopped
+    networks:
+      - vpn-network
+
+networks:
+  vpn-network:
+    driver: bridge
