@@ -14,7 +14,7 @@ WORKDIR /app
 
 # 下载并安装gost
 RUN GOST_VERSION="2.12.0" \
-    && GOST_FILENAME="gost_${GOST_VERSION}_linux_amd64.tar.gz" \
+    && GOST_FILENAME="gost_${GOST_VERSION}_linux_amd64v3.tar.gz" \
     && curl -L -o /tmp/${GOST_FILENAME} https://github.com/ginuerzh/gost/releases/download/v${GOST_VERSION}/${GOST_FILENAME} \
     && gunzip -c /tmp/${GOST_FILENAME} > /usr/local/bin/gost \
     && chmod +x /usr/local/bin/gost \
