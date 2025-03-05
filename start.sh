@@ -105,23 +105,22 @@ if [ $count -eq 30 ]; then
 fi
 
 # 设置Gost代理参数
-SOCKS_PORT=${SOCKS_PORT:-1080}
-HTTP_PORT=${HTTP_PORT:-8080}
+SS_ALG=${SS_ALG:-chacha20}
+SS_PWD=${SS_PWD:-123456}
+SS_PORT=${SS_PORT:-8338}
 
 # 启动Gost代理服务
 log "INFO" "正在启动Gost代理服务..."
-log "INFO" "SOCKS5代理端口: $SOCKS_PORT"
-log "INFO" "HTTP代理端口: $HTTP_PORT"
+log "INFO" "SS代理端口: $SS_PORT"
 
 # 启动Gost代理服务器
-gost -L "socks5://:$SOCKS_PORT" -L "http://:$HTTP_PORT" &
+gost -L "ss://$SS_ALG:$SS_PWD@:$SS_PORT" &
 GOST_PID=$!
 log "INFO" "Gost代理服务已启动，PID: $GOST_PID"
 
 # 输出代理信息
 log "INFO" "代理服务已启动:"
-log "INFO" "- SOCKS5代理: 0.0.0.0:$SOCKS_PORT"
-log "INFO" "- HTTP代理: 0.0.0.0:$HTTP_PORT"
+log "INFO" "- SS代理: 0.0.0.0:$SS_PORT"
 
 # 定期检查VPN状态并在必要时重连
 log "INFO" "启动VPN状态监控..."

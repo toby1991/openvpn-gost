@@ -1,13 +1,13 @@
 # OpenVPN + Gost 代理 Docker 镜像
 
-这个Docker镜像结合了OpenVPN客户端和Gost代理工具，允许你通过SOCKS5或HTTP代理将流量转发到OpenVPN隧道。
+这个Docker镜像结合了OpenVPN客户端和Gost代理工具，允许你通过ss代理将流量转发到OpenVPN隧道。
 
 ## 功能特点
 
 - 基于Alpine Linux的轻量级镜像
 - 支持挂载自定义OpenVPN配置文件
-- 提供SOCKS5和HTTP代理服务
-- 可自定义代理端口
+- 提供ss代理服务
+- 可自定义代理端口和加密算法
 
 ## 构建镜像
 
@@ -23,9 +23,9 @@ docker build -t openvpn-gost .
 docker run -d \
   --name openvpn-gost \
   --cap-add=NET_ADMIN \
+  --device=/dev/net/tun:/dev/net/tun \
   -v /path/to/your/config.ovpn:/etc/openvpn/config.ovpn \
-  -p 1080:1080 \
-  -p 8080:8080 \
+  -p 8338:8338 \
   openvpn-gost
 ```
 
@@ -34,8 +34,9 @@ docker run -d \
 你可以通过环境变量自定义容器的行为：
 
 - `OVPN_CONFIG`: OpenVPN配置文件的路径（默认为`/etc/openvpn/config.ovpn`）
-- `SOCKS_PORT`: SOCKS5代理端口（默认为`1080`）
-- `HTTP_PORT`: HTTP代理端口（默认为`8080`）
+- `SS_PORT`: ss代理端口（默认为`8338`）
+- `SS_ALG`: ss加密算法（默认为`chacha20`）
+- `SS_PWD`: ss密码（默认为`123456`）
 
 ### 故障排除
 
@@ -59,11 +60,12 @@ docker run -d \
 docker run -d \
   --name openvpn-gost \
   --cap-add=NET_ADMIN \
+  --device=/dev/net/tun:/dev/net/tun \
   -v /path/to/your/config.ovpn:/etc/openvpn/config.ovpn \
-  -e SOCKS_PORT=1081 \
-  -e HTTP_PORT=8081 \
-  -p 1081:1081 \
-  -p 8081:8081 \
+  -e SS_PORT=8338 \
+  -e SS_ALG=aes-256-gcm \
+  -e SS_PWD=your_password \
+  -p 8338:8338 \
   openvpn-gost
 ```
 
@@ -73,8 +75,9 @@ docker run -d \
 2. 启动容器，挂载配置文件
 3. 容器会自动连接到VPN并启动代理服务
 4. 配置你的应用程序使用以下代理：
-   - SOCKS5代理：`<容器IP>:1080`（或你自定义的端口）
-   - HTTP代理：`<容器IP>:8080`（或你自定义的端口）
+   - ss代理：`<容器IP>:8338`（或你自定义的端口）
+   - 加密算法：`chacha20`（或你自定义的算法）
+   - 密码：`123456`（或你自定义的密码）
 
 ## 注意事项
 
@@ -108,10 +111,8 @@ spec:
           capabilities:
             add: ["NET_ADMIN"]
         ports:
-        - containerPort: 1080
-          name: socks
-        - containerPort: 8080
-          name: http
+        - containerPort: 8338
+          name: ss
         volumeMounts:
         - name: config
           mountPath: /etc/openvpn/config.ovpn
@@ -129,12 +130,9 @@ spec:
   selector:
     app: openvpn-gost
   ports:
-  - name: socks
-    port: 1080
-    targetPort: 1080
-  - name: http
-    port: 8080
-    targetPort: 8080
+  - name: ss
+    port: 8338
+    targetPort: 8338
 ```
 
 创建包含OpenVPN配置的ConfigMap：

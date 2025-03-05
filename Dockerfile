@@ -29,7 +29,7 @@ COPY start.sh /app/start.sh
 RUN chmod +x /app/start.sh
 
 # 暴露gost代理端口
-EXPOSE 1080 8080
+EXPOSE 8338
 
 # 设置容器启动命令
 CMD ["/app/start.sh"]
